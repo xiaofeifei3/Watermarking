@@ -66,6 +66,68 @@ public class Watermarking {
     }
 
     public static Bitmap extract(Bitmap encodeBitmap, Bitmap watermarkBitmap){
-        
+        int oWidth = encodeBitmap.getWidth();
+        int oHeight = encodeBitmap.getHeight();
+        int wWidth = watermarkBitmap.getWidth();
+        int wHeight = watermarkBitmap.getHeight();
+        int[] oPixels = new int[3 * oWidth * oHeight];
+        int[] wPixels = new int[3 * oWidth * oHeight];
+        encodeBitmap.getPixels(oPixels, 0, oWidth, 0, 0, oWidth,oHeight);
+        watermarkBitmap.getPixels(wPixels, 0, oWidth, 0, 0, oWidth, oHeight);
+        int[][][] mRgbPixels = ImageUtils.getRGBArrayToMatrix(wPixels, oWidth,
+                oHeight);
+        int[][][] oRgbPixels = ImageUtils.getRGBArrayToMatrix(oPixels, oWidth,
+                oHeight);
+        double[][] oDPixels = MathTool.intToDoubleMatrix(mRgbPixels[2]);
+        double[][] mDPixels = MathTool.intToDoubleMatrix(oRgbPixels[2]);
+        double[][] result = new double[wWidth][wHeight];
+        for (int i = 0; i < wWidth; i++) {
+            for (int j = 0; j < wHeight; j++) {
+                double[][] oBlk = new double[8][8];
+                double[][] mBlk = new double[8][8];
+                int d = 0;
+                int f = 0;
+                for (int m = 0; m < 8; m++) {
+                    for (int n = 0; n < 8; n++) {
+                        oBlk[m][n] = oDPixels[8 * i + m][8 * j + n];
+                        mBlk[m][n] = mDPixels[8 * i + m][8 * j + n];
+                    }
+                }
+                double[][] dOBlk = Fdct.fDctTransform(oBlk);
+                double[][] dMBlk = Fdct.fDctTransform(mBlk);
+                if (dOBlk[3][3] > dMBlk[3][3]) {
+                    d++;
+                } else {
+                    f++;
+                }
+                if (dOBlk[3][4] > dMBlk[3][4]) {
+                    d++;
+                } else {
+                    f++;
+                }
+                if (dOBlk[3][5] > dMBlk[3][5]) {
+                    d++;
+                } else {
+                    f++;
+                }
+                if (dOBlk[4][3] > dMBlk[4][3]) {
+                    d++;
+                } else {
+                    f++;
+                }
+                if (dOBlk[5][3] > dMBlk[5][3]) {
+                    d++;
+                } else {
+                    f++;
+                }
+                if (d < f) {
+                    result[i][j] = 0;
+                } else {
+                    result[i][j] = 1;
+                }
+            }
+        }
+        double[] outResult = ImageUtils.matrixToArray(result);
+        return ImageUtils.getImage(outResult, oWidth, oHeight);
     }
 }
