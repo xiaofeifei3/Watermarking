@@ -30,7 +30,9 @@ public class ImageUtils {
         int count = 0;
         for(int i = 0; i < width; i++){
             for (int j = 0; j < height; j++){
-                bitmap.setPixel(i, j, (int)colors[count ++]);
+                if(count < colors.length) {
+                    bitmap.setPixel(i, j, (int) colors[count++]);
+                }
             }
         }
 

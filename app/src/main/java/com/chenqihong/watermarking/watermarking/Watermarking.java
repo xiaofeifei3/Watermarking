@@ -73,7 +73,7 @@ public class Watermarking {
         int[] oPixels = new int[3 * oWidth * oHeight];
         int[] wPixels = new int[3 * oWidth * oHeight];
         encodeBitmap.getPixels(oPixels, 0, oWidth, 0, 0, oWidth,oHeight);
-        watermarkBitmap.getPixels(wPixels, 0, oWidth, 0, 0, oWidth, oHeight);
+        watermarkBitmap.getPixels(wPixels, 0, wWidth, 0, 0, wWidth, wHeight);
         int[][][] mRgbPixels = ImageUtils.getRGBArrayToMatrix(wPixels, oWidth,
                 oHeight);
         int[][][] oRgbPixels = ImageUtils.getRGBArrayToMatrix(oPixels, oWidth,
@@ -128,6 +128,6 @@ public class Watermarking {
             }
         }
         double[] outResult = ImageUtils.matrixToArray(result);
-        return ImageUtils.getImage(outResult, oWidth, oHeight);
+        return ImageUtils.getImage(outResult, wWidth, wHeight);
     }
 }
